@@ -1,0 +1,44 @@
+import icons from "@/assets/images/icons";
+import { Image, Pressable, Text, View } from "react-native";
+
+type ItemCardProps = {
+  title: string;
+  location: string;
+  datetime: string;
+};
+
+export default function ItemCard({ title, location, datetime }: ItemCardProps) {
+  return (
+    <View className="bg-app-card border border-app-border rounded-lg p-4 mb-3 flex-row items-center gap-4 active:opacity-70">
+      <Image
+        className="bg-app-surface rounded-lg flex-shrink-0"
+        source={icons.livingRoom}
+        style={{ width: 70, height: 70 }}
+        resizeMode="contain"
+      />
+
+      <View className="flex-1">
+        {/* Top row: title + edit */}
+        <View className="flex-row items-start justify-between gap-2 mb-2">
+          <Text
+            className="text-app-text font-semibold text-base flex-1"
+            numberOfLines={2}
+          >
+            {title}
+          </Text>
+          <Pressable className="bg-app-surface rounded-md px-2 py-1 flex-shrink-0">
+            <Text className="text-app-accent text-xs font-medium">Edit</Text>
+          </Pressable>
+        </View>
+
+        {/* Location */}
+        <Text className="text-app-muted text-sm mb-1" numberOfLines={1}>
+          {location}
+        </Text>
+
+        {/* Date / time */}
+        <Text className="text-app-muted text-xs">Added {datetime}</Text>
+      </View>
+    </View>
+  );
+}
