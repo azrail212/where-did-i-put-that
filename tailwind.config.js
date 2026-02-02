@@ -10,18 +10,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        app: {
-          bg: "#F9FAFB",
-          surface: "#F3F4F6",
-          card: "#FFFFFF",
-          text: "#111827",
-          muted: "#6B7280",
-          border: "#E5E7EB",
-          accent: "#4F8A8B",
-        },
+        "app-bg": "#F7F7F5",
+        "app-card": "#FFFFFF",
+        "app-surface": "#F1F3F2",
+        "app-border": "#E2E6E4",
+        "app-text": "#0F172A",
+        "app-muted": "#64748B",
+        "app-accent": "#4F8A8B",
       },
       borderRadius: {
-        card: "16px",
+        card: "14px",
       },
     },
   },

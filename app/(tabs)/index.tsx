@@ -1,8 +1,10 @@
 import ItemCard from "@/components/ItemCard";
+import ScreenHeader from "@/components/ScreenHeader";
 import { listItems, type Item } from "@/lib/itemsRepo";
+import { Ionicons as Icon } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useEffect, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { ScrollView, Text, TextInput, View } from "react-native";
 
 export default function HomeScreen() {
   const [items, setItems] = useState<Item[]>([]);
@@ -36,12 +38,17 @@ export default function HomeScreen() {
   );
 
   return (
-    <ScrollView className="bg-app-bg">
-      <View className="flex-1 bg-app-bg px-4 pt-14">
-        {/* Title */}
-        <Text className="text-app-text text-2xl font-semibold mb-6">
-          Where did I put that?
-        </Text>
+    <ScrollView>
+      <ScreenHeader screenName="Where Did I Put That?" />
+      <View className="flex-1 bg-app-bg px-4 pt-4">
+        <View className="bg-app-card border border-app-border rounded-card px-4 py-3 flex-row items-center mb-4">
+          <Icon name="search" size={16} color="#64748B" />
+          <TextInput
+            placeholder="Search items or locations..."
+            className="ml-3 flex-1 text-app-text"
+            placeholderTextColor="#64748B"
+          />
+        </View>
 
         {loading && <Text className="text-app-muted">Loading…</Text>}
 

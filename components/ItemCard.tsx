@@ -8,13 +8,34 @@ type ItemCardProps = {
 };
 
 export default function ItemCard({ title, location, datetime }: ItemCardProps) {
+  function formatDate(iso: string) {
+    const date = new Date(iso);
+
+    if (isNaN(date.getTime())) {
+      return "";
+    }
+
+    return (
+      date.toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }) +
+      " · " +
+      date.toLocaleTimeString(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    );
+  }
   return (
-    <View className="bg-app-card border border-app-border rounded-lg p-4 mb-3 flex-row items-center gap-4 active:opacity-70">
+    <View className="bg-app-card border border-app-border rounded-card p-4 mb-3 flex-row items-center gap-4 active:opacity-80">
       <Image
-        className="bg-app-surface rounded-lg flex-shrink-0"
+        className=" rounded-lg flex-shrink-0"
         source={icons.livingRoom}
-        style={{ width: 70, height: 70 }}
+        style={{ width: 50, height: 50 }}
         resizeMode="contain"
+        tintColor="#4F8A8B"
       />
 
       <View className="flex-1">
@@ -37,7 +58,7 @@ export default function ItemCard({ title, location, datetime }: ItemCardProps) {
         </Text>
 
         {/* Date / time */}
-        <Text className="text-app-muted text-xs">Added {datetime}</Text>
+        <Text className="text-app-muted text-xs">{formatDate(datetime)}</Text>
       </View>
     </View>
   );
