@@ -1,4 +1,6 @@
 import { initDb } from "@/lib/db";
+import { seedDemoItems } from "@/lib/itemsRepo";
+
 import {
   DarkTheme,
   DefaultTheme,
@@ -19,17 +21,20 @@ export const unstable_settings = {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   useEffect(() => {
-    initDb().catch(console.error);
+    (async () => {
+      try {
+        await initDb();
+        await seedDemoItems();
+      } catch (e) {
+        console.error(e);
+      }
+    })();
   }, []);
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="modal"
-          options={{ presentation: "modal", title: "Modal" }}
-        />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
