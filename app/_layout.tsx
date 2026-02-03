@@ -1,5 +1,5 @@
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { initDb } from "@/lib/db";
-
 import {
   DarkTheme,
   DefaultTheme,
@@ -12,47 +12,36 @@ import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import "../global.css";
 
-import { useColorScheme } from "@/hooks/use-color-scheme";
-
 export const unstable_settings = {
   anchor: "(tabs)",
 };
+
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    SplashScreen.setOptions({ duration: 600, fade: true });
+
     (async () => {
       try {
         await initDb();
+      } finally {
         setReady(true);
-      } catch (e) {
-        console.error(e);
+        SplashScreen.hideAsync().catch(() => {});
       }
     })();
   }, []);
 
-  SplashScreen.setOptions({
-    duration: 1000,
-    fade: true,
-  });
-
-  if (!ready) {
-    return null; // simplest "loading" for now
-  }
+  if (!ready) return null;
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen
-          name="(tabs)"
-          options={{
-            headerShown: false,
-            headerStyle: { backgroundColor: "#f7f7f5" },
-            headerShadowVisible: false,
-          }}
-        />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="edit-item/[id]" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

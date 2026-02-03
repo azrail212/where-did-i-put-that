@@ -13,7 +13,7 @@ export default function ScreenHeader({
   showLogo = false,
 }: ScreenHeaderProps) {
   return (
-    <View className="bg-white pt-[50px] items-left px-4 pb-3 border-b border-app-border flex-row gap-4">
+    <View className="bg-white pt-14 items-center px-4 pb-3 border-b border-app-border flex-row gap-4 ">
       {backButton && (
         <Icon
           name="arrow-back"
@@ -31,7 +31,7 @@ export default function ScreenHeader({
         />
       )}
 
-      <Text className="text-app-text text-2xl font-semibold items-center align-middle">
+      <Text className="text-app-text text-2xl font-semibold flex-1">
         {screenName}
       </Text>
     </View>

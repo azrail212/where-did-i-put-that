@@ -51,7 +51,7 @@ export default function TabLayout() {
           tabBarIcon: () => (
             <View
               style={{
-                transform: [{ translateY: -18 }, { translateX: 60 }],
+                transform: [{ translateY: -18 }, { translateX: 30 }],
                 elevation: 10, // Android shadow for the button
                 shadowOpacity: 0.18, // iOS shadow for the button
                 shadowRadius: 10,
