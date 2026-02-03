@@ -82,3 +82,13 @@ export async function deleteItem(id: string) {
     [id],
   );
 }
+
+export async function restoreItem(item: Item) {
+  await run(
+    `
+    INSERT INTO items (id, name, location, createdAt)
+    VALUES (?, ?, ?, ?);
+    `,
+    [item.id, item.name, item.location, item.createdAt],
+  );
+}
