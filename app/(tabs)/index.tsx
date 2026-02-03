@@ -4,7 +4,7 @@ import { listItems, type Item } from "@/lib/itemsRepo";
 import { Ionicons as Icon } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import React, { useCallback, useEffect, useState } from "react";
-import { FlatList, Image, Text, TextInput, View } from "react-native";
+import { FlatList, Text, TextInput, View } from "react-native";
 
 export default function HomeScreen() {
   const [items, setItems] = useState<Item[]>([]);
@@ -68,12 +68,6 @@ export default function HomeScreen() {
                 placeholderTextColor="#64748B"
               />
             </View>
-
-            <Image
-              source={require("../../assets/images/logo.png")}
-              className="w-full h-48 mb-4"
-              resizeMode="contain"
-            />
 
             {loading && <Text className="text-app-muted mb-3">Loading…</Text>}
 
