@@ -4,7 +4,7 @@ import { listItems, type Item } from "@/lib/itemsRepo";
 import { Ionicons as Icon } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import React, { useCallback, useEffect, useState } from "react";
-import { Image, ScrollView, Text, TextInput, View } from "react-native";
+import { FlatList, Image, Text, TextInput, View } from "react-native";
 
 export default function HomeScreen() {
   const [items, setItems] = useState<Item[]>([]);
@@ -49,47 +49,56 @@ export default function HomeScreen() {
   });
 
   return (
-    <ScrollView>
-      <ScreenHeader screenName="Where Did I Put That?" />
-      <View className="flex-1 bg-app-bg px-4 pt-4 pb-28">
-        <View className="bg-app-card border border-app-border rounded-card p-4 mb-6 text-app-text flex-row items-center">
-          <Icon name="search" size={18} color="#64748B" />
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            placeholder="Search items or locations..."
-            className="ml-3 flex-1 text-app-text"
-            placeholderTextColor="#64748B"
-          />
-        </View>
-        <Image
-          source={require("../../assets/images/logo.png")}
-          className="w-full h-48 mb-4"
-        />
+    <View className="flex-1 bg-app-bg">
+      <ScreenHeader screenName="Where Did I Put That?" showLogo />
+      <FlatList
+        data={filteredItems}
+        keyExtractor={(item) => item.id}
+        className="px-4 pt-4"
+        contentContainerStyle={{ paddingBottom: 120 }}
+        ListHeaderComponent={
+          <View>
+            <View className="bg-app-card border border-app-border rounded-card p-4 mb-6 flex-row items-center">
+              <Icon name="search" size={18} color="#64748B" />
+              <TextInput
+                value={query}
+                onChangeText={setQuery}
+                placeholder="Search items or locations..."
+                className="ml-3 flex-1 text-app-text"
+                placeholderTextColor="#64748B"
+              />
+            </View>
 
-        {loading && <Text className="text-app-muted">Loading…</Text>}
+            <Image
+              source={require("../../assets/images/logo.png")}
+              className="w-full h-48 mb-4"
+              resizeMode="contain"
+            />
 
-        {!loading && errorMsg && (
-          <Text className="text-app-muted">{errorMsg}</Text>
-        )}
+            {loading && <Text className="text-app-muted mb-3">Loading…</Text>}
 
-        {!loading && !errorMsg && filteredItems.length === 0 && (
-          <Text className="text-app-muted">
-            Looks like the past you didn't care enough to keep track of any
-            items under that search.
-          </Text>
-        )}
-        {!loading &&
-          !errorMsg &&
-          filteredItems.map((item) => (
+            {!loading && errorMsg && (
+              <Text className="text-app-muted mb-3">{errorMsg}</Text>
+            )}
+
+            {!loading && !errorMsg && filteredItems.length === 0 && (
+              <Text className="text-app-muted mb-3">
+                Looks like the past you didn't care enough to add any items
+                under that search.
+              </Text>
+            )}
+          </View>
+        }
+        renderItem={({ item }) =>
+          !loading && !errorMsg ? (
             <ItemCard
-              key={item.id}
               title={item.name}
               location={item.location}
               datetime={item.createdAt}
             />
-          ))}
-      </View>
-    </ScrollView>
+          ) : null
+        }
+      />
+    </View>
   );
 }
