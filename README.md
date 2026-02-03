@@ -22,17 +22,12 @@ npm run start
 
 ### Screenshots
 
-#### Home Screen
+<h2 align="center">📱 App Preview</h2>
 
-![Home Screen](docs/screenshots/home.png)
-
-#### Add Item
-
-![Add Item](docs/screenshots/add-item.png)
-
-#### Welcome Screen
-
-![Welcome Screen](docs/screenshots/welcome-screen.png)
+<p align="center">
+  <img src="docs/home.png" width="250" alt="Home screen"/>
+  <img src="docs/add-item.png" width="250" alt="Add item screen"/>
+</p>
 
 ### Documentation
 
