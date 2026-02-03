@@ -1,24 +1,40 @@
 # Where Did I Put That?
 
-A simple Android app (React Native + Expo) to quickly save where you stored something at home — and find it later in seconds.
+A minimalist React Native + Expo mobile app for tracking where you store household items.
 
-## What it does
+**Tech Stack:** Expo SDK 54 · React Native 0.81 · SQLite (local DB) · NativeWind (Tailwind CSS)
 
-- Save an item name + where you put it
-- Search items by name
-- Works offline (local storage)
+### Features
 
-## Tech stack
+- Add, edit, delete, and search stored items
+- Local persistence with SQLite
+- Undo deletion (snackbar countdown)
+- Clean, responsive UI using NativeWind
 
-- React Native (Expo)
-- React Navigation
-- Local storage (TBD: AsyncStorage or SQLite)
+### Run locally
 
-## Project status
+```bash
+npm install
+npm run start
+```
 
-This is a learning project and currently in early development.
+---
 
-## Documentation
+### Screenshots
+
+#### Home Screen
+
+![Home Screen](docs/screenshots/home.png)
+
+#### Add Item
+
+![Add Item](docs/screenshots/add-item.png)
+
+#### Welcome Screen
+
+![Welcome Screen](docs/screenshots/welcome-screen.png)
+
+### Documentation
 
 See the `/docs` folder:
 
@@ -27,10 +43,6 @@ See the `/docs` folder:
 - `docs/02-data-model.md` – data model
 - `docs/03-roadmap.md` – roadmap
 
-## Getting started (later)
-
-Setup instructions will be added once the Expo project is initialized.
-
 ## License
 
-TBD
+MIT
