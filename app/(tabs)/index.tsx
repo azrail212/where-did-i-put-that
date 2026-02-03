@@ -31,8 +31,10 @@ export default function HomeScreen() {
   const [undoSeconds, setUndoSeconds] = useState(5);
 
   // Timers
-  const undoDeleteTimer = useRef<NodeJS.Timeout | null>(null);
-  const undoCountdownTimer = useRef<NodeJS.Timeout | null>(null);
+  const undoDeleteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const undoCountdownTimer = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
 
   /** Load items from DB */
   const loadItems = useCallback(async () => {
