@@ -25,8 +25,8 @@ npm run start
 <h2 align="center">📱 App Preview</h2>
 
 <p align="center">
-  <img src="docs/home.png" width="250" alt="Home screen"/>
-  <img src="docs/add-item.png" width="250" alt="Add item screen"/>
+  <img src="docs/screenshots/home.png" width="250" alt="Home screen"/>
+  <img src="docs/screenshots/add-item.png" width="250" alt="Add item screen"/>
 </p>
 
 ### Documentation
