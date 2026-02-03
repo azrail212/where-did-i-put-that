@@ -6,6 +6,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
@@ -31,6 +32,11 @@ export default function RootLayout() {
       }
     })();
   }, []);
+
+  SplashScreen.setOptions({
+    duration: 1000,
+    fade: true,
+  });
 
   if (!ready) {
     return null; // simplest "loading" for now
