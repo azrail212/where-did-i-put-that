@@ -1,12 +1,14 @@
 import ItemCard from "@/components/ItemCard";
 import ScreenHeader from "@/components/ScreenHeader";
-import { listItems, type Item } from "@/lib/itemsRepo";
+import { deleteItem, listItems, type Item } from "@/lib/itemsRepo";
 import { Ionicons as Icon } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-import React, { useCallback, useEffect, useState } from "react";
-import { FlatList, Text, TextInput, View } from "react-native";
+import { useRouter } from "expo-router";
+import React, { useCallback, useState } from "react";
+import { Alert, FlatList, Text, TextInput, View } from "react-native";
 
 export default function HomeScreen() {
+  const router = useRouter();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -25,11 +27,6 @@ export default function HomeScreen() {
       setLoading(false);
     }
   }, []);
-
-  // First load
-  useEffect(() => {
-    load();
-  }, [load]);
 
   // Reload when user returns to Home tab (after adding/editing later)
   useFocusEffect(
@@ -76,19 +73,38 @@ export default function HomeScreen() {
             )}
 
             {!loading && !errorMsg && filteredItems.length === 0 && (
-              <Text className="text-app-muted mb-3">
-                Looks like the past you didn't care enough to add any items
-                under that search.
-              </Text>
+              <Text className="text-app-muted mb-3">No items added yet.</Text>
             )}
           </View>
         }
         renderItem={({ item }) =>
           !loading && !errorMsg ? (
             <ItemCard
+              id={item.id}
               title={item.name}
               location={item.location}
               datetime={item.createdAt}
+              onEdit={(id) => {
+                router.push(`../edit-item/${id}`);
+                console.log("edit", id);
+              }}
+              onDelete={(id) => {
+                Alert.alert(
+                  "Delete item?",
+                  "Are you sure you want to delete this item?",
+                  [
+                    { text: "Cancel", style: "cancel" },
+                    {
+                      text: "Delete",
+                      style: "destructive",
+                      onPress: async () => {
+                        await deleteItem(id);
+                        load();
+                      },
+                    },
+                  ],
+                );
+              }}
             />
           ) : null
         }

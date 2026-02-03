@@ -1,9 +1,9 @@
+import CustomButton from "@/components/CustomButton";
 import ScreenHeader from "@/components/ScreenHeader";
 import { createItem } from "@/lib/itemsRepo";
-import { Ionicons as Icon } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, Text, TextInput, View } from "react-native";
 
 export default function AddItemScreen() {
   const router = useRouter();
@@ -38,18 +38,12 @@ export default function AddItemScreen() {
           placeholder="E.g., Office Desk, Kitchen Shelf..."
           className="bg-app-card border border-app-border rounded-card p-4 mb-6 text-app-text"
         />
-        <Pressable
+        <CustomButton
+          text="Save Item"
           onPress={onSave}
-          disabled={name.trim().length === 0 || location.trim().length === 0}
-          className={`rounded-card py-4 items-center flex-row justify-center ${
-            name.trim() === "" || location.trim() === ""
-              ? "bg-app-accent/60"
-              : "bg-app-accent"
-          }`}
-        >
-          <Icon name="save" size={18} color="white" className="mr-2" />
-          <Text className="text-white font-psemibold">Save Item</Text>
-        </Pressable>
+          iconName="save"
+          disabled={name.trim() === "" || location.trim() === ""}
+        />
       </View>
     </ScrollView>
   );

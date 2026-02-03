@@ -1,6 +1,6 @@
 // lib/itemsRepo.ts
 import { randomUUID } from "expo-crypto";
-import { getAll, run } from "./db";
+import { getAll, getFirst, run } from "./db";
 
 /**
  * Domain model for an item.
@@ -50,9 +50,35 @@ export async function updateItem(
     location?: string;
   },
 ) {
-  // TODO: update item
+  await run(
+    `
+      UPDATE items 
+      SET name = ?,
+          location = ?
+      WHERE id=?;
+      `,
+    [updates.name ?? "", updates.location ?? "", id],
+  );
+}
+
+export async function getItemById(id: string) {
+  return getFirst<Item>(
+    `
+    SELECT id, name, location, createdAt
+    FROM items
+    WHERE id = ?
+    LIMIT 1;
+    `,
+    [id],
+  );
 }
 
 export async function deleteItem(id: string) {
-  // TODO: delete item
+  await run(
+    `
+      DELETE FROM items 
+      WHERE id=?;
+      `,
+    [id],
+  );
 }
