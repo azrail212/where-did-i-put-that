@@ -38,6 +38,12 @@ See the `/docs` folder:
 - `docs/02-data-model.md` – data model
 - `docs/03-roadmap.md` – roadmap
 
+### Test the APK
+
+For a working apk downloadable, see <a href="https://github.com/azrail212/where-did-i-put-that/releases/tag/v1.0.0">Releases.</a>
+
 ## License
 
 MIT
+
+##
