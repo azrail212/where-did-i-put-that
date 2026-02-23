@@ -211,6 +211,7 @@ export default function HomeScreen() {
             id={item.id}
             title={item.name}
             location={item.location}
+            category={item.category}
             datetime={item.createdAt}
             onEdit={(id) => router.push(`/edit-item/${id}`)}
             onDelete={confirmDelete}

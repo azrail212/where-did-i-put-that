@@ -1,73 +1,124 @@
 # Where Did I Put That?
 
-A simple Android app to quickly save where you put things at home and find them later.
+A calm, offline-first Android app for quickly saving where you put
+things --- and finding them instantly later.
 
 ---
 
 ## 1. Project Vision
 
-**Problem**  
-Busy people (especially parents) often forget where they stored items (e.g. Christmas decorations, documents, cables, toys).
+### Problem
 
-**Solution**  
-A calm, fast, offline-first mobile app that answers one question:
+People forget where they stored things (documents, decorations, cables,
+tools, toys).
+
+### Solution
+
+A fast, zero-friction mobile app that answers:
+
 > "Where did I put this?"
 
-**Core principle**  
-Reduce mental load. No setup, no hierarchy, no thinking.
+### Core Principle
+
+Reduce mental load.\
+No setup. No folders. No hierarchy. Just save and find.
 
 ---
 
-## 2. MVP Definition (Smallest Possible Version)
+## 2. Current MVP Scope (Implemented)
 
 ### Goal
-Save an item + its location in under 15 seconds and find it later instantly.
 
-### Screens (MVP)
-1. **Home / Search**
-   - Search bar
-   - List of items (newest first)
-   - Tap item to see location
+Save an item + location in under 15 seconds and retrieve it instantly.
 
-2. **Add Item**
-   - Item name (required)
-   - Location / where it is (required)
-   - Save button
+---
 
-### Out of scope (v1)
-- Rooms / boxes
+### Screens (Current Version)
+
+1.  **Home (Items List)**
+    - Displays items (newest first)
+    - Search filtering
+    - Tap to edit
+    - Delete support
+    - Clean card layout
+2.  **Add Item**
+    - Item name (required)
+    - Location (required)
+    - Save button
+3.  **Edit Item**
+    - Pre-filled item
+    - Update values
+    - Delete option
+
+---
+
+### What Exists
+
+The app includes:
+
+- Edit functionality
+- Delete functionality
+- Repository abstraction layer (`itemsRepo`)
+- SQLite persistence
+- Bottom Tabs navigation (Expo Router)
+- Reusable UI components
+- Structured folder architecture
+- Documentation folder
+
+---
+
+### Out of Scope (v1)
+
 - Photos
-- Accounts / login
+- Categories / rooms
 - Cloud sync
-- Settings
-- Dark mode
+- Accounts / login
+- Dark mode toggle
+- Settings screen
 
 ---
 
 ## 3. User Stories
 
-- As a user, I want to add an item with its location so I can find it later.
-- As a user, I want to search items by name so I can quickly locate them.
-- As a user, I want to see the newest items first.
-- As a user, I want to edit an item if I made a mistake.
-- As a user, I want to delete an item I no longer need.
+- As a user, I can add an item with its location.
+- As a user, I can search items by name.
+- As a user, I see newest items first.
+- As a user, I can edit an item.
+- As a user, I can delete an item.
+- As a user, I can use the app offline.
 
 ---
 
-## 4. Data Model (Local First)
+## 4. Architecture
+
+### Pattern Used
+
+UI → Repository Layer → SQLite
+
+You separated: - Screens (UI logic) - Data layer (`itemsRepo.ts`) -
+Database connection (`db.ts`)
+
+This makes the project scalable and production-ready in structure.
+
+---
+
+## 5. Data Model
 
 ### Item
-- `id`: string
-- `name`: string
-- `location`: string
-- `createdAt`: ISO string
 
-### Storage
-- Local first (offline)
-- **SQLite** via `expo-sqlite`
-- Table: `items`
+```ts
+{
+  id: string;
+  name: string;
+  location: string;
+  createdAt: string;
+}
+```
 
-Proposed schema:
+### SQLite Schema
+
+Table: `items`
+
 - `id` TEXT PRIMARY KEY
 - `name` TEXT NOT NULL
 - `location` TEXT NOT NULL
@@ -75,27 +126,63 @@ Proposed schema:
 
 ---
 
-## 5. Tech Stack
+## 6. Tech Stack
 
 - **Platform:** Android
 - **Framework:** React Native (Expo)
-- **Routing/Navigation:** Expo Router
-- **Styling:** NativeWind (Tailwind-style classes)
-- **Storage:** SQLite (expo-sqlite)
+- **Routing:** Expo Router (file-based routing)
+- **Navigation:** Tabs Layout
+- **Styling:** NativeWind (Tailwind for React Native)
+- **Storage:** SQLite (`expo-sqlite`)
 - **Language:** TypeScript
-- **Version control:** Git + GitHub
+- **Architecture style:** Repository Pattern
+- **Version Control:** Git + GitHub
+- **Build System:** EAS
 
 ---
 
-## 6. Design System (v1)
+## 7. Repo Structure
 
-### Design goals
+    where-did-i-put-that/
+    ├── app/
+    │   ├── _layout.tsx
+    │   ├── (tabs)/
+    │   │   ├── _layout.tsx
+    │   │   ├── index.tsx
+    │   │   └── add-item.tsx
+    │   └── edit-item/
+    │       └── [id].tsx
+    │
+    ├── components/
+    │   ├── CustomButton.tsx
+    │   ├── ItemCard.tsx
+    │   └── ScreenHeader.tsx
+    │
+    ├── lib/
+    │   ├── db.ts
+    │   └── itemsRepo.ts
+    │
+    ├── docs/
+    │   └── project-plan.md
+    │
+    ├── tailwind.config.js
+    ├── babel.config.js
+    └── package.json
+
+---
+
+## 8. Design System
+
+### Design Goals
+
 - Calm
+- Minimal
+- Soft
 - Friendly
-- Non-technical
-- "Sticky note" feeling
+- No heavy UI noise
 
-### Color palette
+### Core Colors
+
 - Background: `#F7F7F5`
 - Card: `#FFFFFF`
 - Primary text: `#1F2933`
@@ -103,117 +190,84 @@ Proposed schema:
 - Border: `#E5E7EB`
 - Accent: `#4F8A8B`
 
-### UI rules
-- Rounded corners: 12–16px
-- No heavy shadows
-- Accent color only for actions (Add / Save)
-- Light mode only (v1)
+### UI Rules
+
+- Rounded corners (12--16px)
+- Minimal shadows
+- Accent only for actions
+- Light-first design
 
 ---
 
-## 7. UI Wireframes (v1)
+## 9. Development Phases
 
-Lightweight wireframes were created in Figma to validate layout and UX simplicity before coding.
+### v0.1 -- Foundation
 
-### Screens
-1. **Home / Search**
-   - Search bar
-   - List of saved items (newest first)
-   - Floating "Add item" button
+- Expo initialization
+- NativeWind setup
+- Basic screen structure
 
-2. **Add Item**
-   - Item name input
-   - Location input
-   - Save button
+### v0.2 -- Core Data Layer
 
-Wireframe images are exported to `/docs/assets` for reference.
+- SQLite integration
+- Repository abstraction
+- CRUD operations
 
----
+### v0.3 -- UX Improvements
 
-## 8. App Naming
+- Search
+- Edit
+- Delete
+- Empty states
+- Reusable components
 
-**Display name:** Where Did I Put That?
+### v1.0 -- MVP Release
 
-**Internal/project name:** where-did-i-put-that
-
----
-
-## 8. Repo Structure
-
-```
-where-did-i-put-that/
-├── app/
-│   ├── index.tsx        # Home / search screen
-│   └── add.tsx          # Add item screen
-├── components/
-├── docs/
-│   └── project-plan.md
-├── App.tsx
-├── tailwind.config.js
-├── babel.config.js
-└── README.md
-```
-
----
-
-## 9. Development Roadmap
-
-### v0.1 – Foundation
-- Initialize Expo app
-- Set up NativeWind
-- Basic Home screen
-
-### v0.2 – Core functionality
-- Add Item screen
-- Save items to SQLite
-- List items from database
-
-### v0.3 – Usability
-- Search items (SQLite query)
-- Edit / delete items
-- Basic empty states
-
-### v1.0 – MVP release
 - UI polish
-- App icon
-- Android build
+- Android production build
+- GitHub documentation cleanup
 
 ---
 
 ## 10. Daily Git Workflow
 
-1. `git pull`
-2. Work on one small task
-3. `git status`
-4. `git add <files>`
-5. `git commit -m "Add item save logic"`
-6. `git push`
+1.  `git pull`
+2.  Work on one small task
+3.  `git status`
+4.  `git add <files>`
+5.  `git commit -m "Add item save logic"`
+6.  `git push`
 
 Commit often. Small, clear commits.
 
 ---
 
-## 11. Future Ideas (Optional)
+## 11. Future Roadmap
 
-- Photos for items
-- Voice input
-- Reminders ("check in December")
-- Backup/export
-- Family sharing
+- Photos per item
+- Tagging / rooms
+- Backup export (JSON)
 - Cloud sync (Appwrite)
+- Cross-platform (iOS)
+- Web version
+- Voice input
+- AI-powered search (semantic match)
+- Multi-user / family mode
 
 ---
 
 ## 12. Success Criteria
 
 The app is successful if:
-- Adding an item takes < 15 seconds
-- Searching feels instant
-- App feels calm, not busy
-- User opens it without hesitation
+
+- Add flow takes \< 15 seconds
+- Search feels instant
+- Zero onboarding required
+- Works fully offline
+- Feels calmer than a Notes app
+- Codebase is scalable and readable
 
 ---
 
-This document is the single source of truth for the project.
+This document is the single source of truth for the project.\
 Update it only when scope or direction changes.
-

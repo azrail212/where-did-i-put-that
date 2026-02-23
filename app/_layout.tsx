@@ -42,6 +42,7 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="edit-item/[id]" />
+        <Stack.Screen name="add-item" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

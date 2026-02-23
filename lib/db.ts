@@ -10,11 +10,10 @@ let db: SQLite.SQLiteDatabase | null = null;
  * Current schema version of your app database.
  * Increment this when you change tables/columns.
  */
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 5;
 
 /**
  * Open (or reuse) the SQLite DB file on the device.
- * This creates a file like: where-did-i-put-that.db (on the phone).
  */
 export async function getDb() {
   if (db) return db;
@@ -24,33 +23,30 @@ export async function getDb() {
 
 /**
  * Initialize DB: set pragmas + run migrations.
- * Call this once on app start (e.g. in app/_layout.tsx).
  */
 export async function initDb() {
   const database = await getDb();
 
-  // Pragmas (safe defaults)
-  // WAL improves concurrency and is common for apps.
   await database.execAsync(`
     PRAGMA journal_mode = WAL;
     PRAGMA foreign_keys = ON;
   `);
 
-  // Read existing schema version
   const row = await database.getFirstAsync<{ user_version: number }>(
     `PRAGMA user_version;`,
   );
   const currentVersion = row?.user_version ?? 0;
 
   if (currentVersion >= SCHEMA_VERSION) {
-    return; // already up to date
+    return;
   }
 
-  // Run migrations step-by-step
   await database.execAsync("BEGIN TRANSACTION;");
   try {
+    /**
+     * v1 — initial items table
+     */
     if (currentVersion < 1) {
-      // v1 schema
       await database.execAsync(`
         CREATE TABLE IF NOT EXISTS items (
           id TEXT PRIMARY KEY NOT NULL,
@@ -61,12 +57,74 @@ export async function initDb() {
       `);
     }
 
-    // Update schema version
+    /**
+     * v2 — ensure location column exists
+     */
+    if (currentVersion < 2) {
+      const cols = await database.getAllAsync<{ name: string }>(
+        `PRAGMA table_info(items);`,
+      );
+      const hasLocation = cols.some((c) => c.name === "location");
+      if (!hasLocation) {
+        await database.execAsync(
+          `ALTER TABLE items ADD COLUMN location TEXT NOT NULL DEFAULT '';`,
+        );
+      }
+    }
+
+    /**
+     * v3 — rooms table
+     */
+    if (currentVersion < 3) {
+      await database.execAsync(`
+        CREATE TABLE IF NOT EXISTS rooms (
+          id TEXT PRIMARY KEY NOT NULL,
+          name TEXT NOT NULL,
+          places TEXT NOT NULL DEFAULT '',
+          createdAt TEXT NOT NULL
+        );
+      `);
+    }
+
     await database.execAsync(`PRAGMA user_version = ${SCHEMA_VERSION};`);
     await database.execAsync("COMMIT;");
   } catch (e) {
     await database.execAsync("ROLLBACK;");
     throw e;
+  }
+
+  /**
+   * v4 — link items to rooms
+   */
+  if (currentVersion < 4) {
+    const cols = await database.getAllAsync<{ name: string }>(
+      `PRAGMA table_info(items);`,
+    );
+
+    const hasRoomId = cols.some((c) => c.name === "roomId");
+
+    if (!hasRoomId) {
+      await database.execAsync(`
+      ALTER TABLE items 
+      ADD COLUMN roomId TEXT 
+      REFERENCES rooms(id) 
+      ON DELETE SET NULL;
+    `);
+    }
+  }
+
+  if (currentVersion < 5) {
+    const cols = await database.getAllAsync<{ name: string }>(
+      `PRAGMA table_info(items);`,
+    );
+
+    const hasCategory = cols.some((c) => c.name === "category");
+
+    if (!hasCategory) {
+      await database.execAsync(
+        `ALTER TABLE items ADD COLUMN category TEXT NOT NULL DEFAULT 'Miscellaneous';`,
+      );
+    }
   }
 }
 
@@ -90,7 +148,7 @@ export async function getAll<T>(
 }
 
 /**
- * Helper: get the first row (or null) from a SELECT
+ * Helper: get the first row (or null)
  */
 export async function getFirst<T>(
   sql: string,
@@ -99,4 +157,28 @@ export async function getFirst<T>(
   const database = await getDb();
   const row = await database.getFirstAsync<T>(sql, params);
   return row ?? null;
+}
+
+/**
+ * Development helper: drop and recreate DB schema.
+ */
+export async function resetDb() {
+  const database = await getDb();
+
+  await database.execAsync("BEGIN TRANSACTION;");
+  try {
+    await database.execAsync(`DROP TABLE IF EXISTS items;`);
+    await database.execAsync(`DROP TABLE IF EXISTS rooms;`);
+
+    await database.execAsync(`PRAGMA user_version = 0;`);
+
+    await database.execAsync("COMMIT;");
+  } catch (e) {
+    await database.execAsync("ROLLBACK;");
+    throw e;
+  }
+
+  db = null;
+
+  await initDb();
 }
