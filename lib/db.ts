@@ -1,6 +1,7 @@
 // lib/db.ts
+import { randomUUID } from "expo-crypto";
 import * as SQLite from "expo-sqlite";
-
+import { DEFAULT_ROOMS } from "./defaultRooms";
 /**
  * Single DB instance (kept in memory once opened)
  */
@@ -10,7 +11,7 @@ let db: SQLite.SQLiteDatabase | null = null;
  * Current schema version of your app database.
  * Increment this when you change tables/columns.
  */
-const SCHEMA_VERSION = 5;
+const SCHEMA_VERSION = 6;
 
 /**
  * Open (or reuse) the SQLite DB file on the device.
@@ -81,9 +82,72 @@ export async function initDb() {
           id TEXT PRIMARY KEY NOT NULL,
           name TEXT NOT NULL,
           places TEXT NOT NULL DEFAULT '',
+          icon TEXT NOT NULL DEFAULT 'home',
           createdAt TEXT NOT NULL
         );
       `);
+
+      // Seed default rooms on first creation only
+      for (const room of DEFAULT_ROOMS) {
+        await database.runAsync(
+          `
+    INSERT INTO rooms (id, name, places, icon, createdAt)
+    VALUES (?, ?, '', ?, ?);
+    `,
+          [randomUUID(), room.name, room.icon, new Date().toISOString()],
+        );
+      }
+    }
+
+    /**
+     * v4 — link items to rooms
+     */
+    if (currentVersion < 4) {
+      const cols = await database.getAllAsync<{ name: string }>(
+        `PRAGMA table_info(items);`,
+      );
+
+      const hasRoomId = cols.some((c) => c.name === "roomId");
+
+      if (!hasRoomId) {
+        await database.execAsync(`
+      ALTER TABLE items 
+      ADD COLUMN roomId TEXT 
+      REFERENCES rooms(id) 
+      ON DELETE SET NULL;
+    `);
+      }
+    }
+
+    if (currentVersion < 5) {
+      const cols = await database.getAllAsync<{ name: string }>(
+        `PRAGMA table_info(items);`,
+      );
+
+      const hasCategory = cols.some((c) => c.name === "category");
+
+      if (!hasCategory) {
+        await database.execAsync(
+          `ALTER TABLE items ADD COLUMN category TEXT NOT NULL DEFAULT 'Miscellaneous';`,
+        );
+      }
+    }
+
+    /**
+     * v6 — add icon column to rooms (default 'home')
+     */
+    if (currentVersion < 6) {
+      const cols = await database.getAllAsync<{ name: string }>(
+        `PRAGMA table_info(rooms);`,
+      );
+
+      const hasIcon = cols.some((c) => c.name === "icon");
+
+      if (!hasIcon) {
+        await database.execAsync(
+          `ALTER TABLE rooms ADD COLUMN icon TEXT NOT NULL DEFAULT 'home';`,
+        );
+      }
     }
 
     await database.execAsync(`PRAGMA user_version = ${SCHEMA_VERSION};`);
@@ -91,40 +155,6 @@ export async function initDb() {
   } catch (e) {
     await database.execAsync("ROLLBACK;");
     throw e;
-  }
-
-  /**
-   * v4 — link items to rooms
-   */
-  if (currentVersion < 4) {
-    const cols = await database.getAllAsync<{ name: string }>(
-      `PRAGMA table_info(items);`,
-    );
-
-    const hasRoomId = cols.some((c) => c.name === "roomId");
-
-    if (!hasRoomId) {
-      await database.execAsync(`
-      ALTER TABLE items 
-      ADD COLUMN roomId TEXT 
-      REFERENCES rooms(id) 
-      ON DELETE SET NULL;
-    `);
-    }
-  }
-
-  if (currentVersion < 5) {
-    const cols = await database.getAllAsync<{ name: string }>(
-      `PRAGMA table_info(items);`,
-    );
-
-    const hasCategory = cols.some((c) => c.name === "category");
-
-    if (!hasCategory) {
-      await database.execAsync(
-        `ALTER TABLE items ADD COLUMN category TEXT NOT NULL DEFAULT 'Miscellaneous';`,
-      );
-    }
   }
 }
 

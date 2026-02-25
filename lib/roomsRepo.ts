@@ -10,6 +10,7 @@ export type Room = {
   id: string;
   name: string;
   places: string; // simple comma-separated string for now
+  icon: string;
   createdAt: string;
 };
 
@@ -22,6 +23,7 @@ export async function listRooms(): Promise<Room[]> {
     SELECT
       id,
       name,
+      icon,
       places,
       createdAt
     FROM rooms
@@ -31,16 +33,17 @@ export async function listRooms(): Promise<Room[]> {
   return getAll<Room>(sql);
 }
 
-export async function createRoom(name: string, places: string) {
+export async function createRoom(name: string, places: string, icon?: string) {
   const id = randomUUID();
   const createdAt = new Date().toISOString();
+  const iconValue = icon ?? "home-outline";
 
   await run(
     `
-    INSERT INTO rooms (id, name, places, createdAt)
-    VALUES (?, ?, ?, ?);
+    INSERT INTO rooms (id, name, places, icon, createdAt)
+    VALUES (?, ?, ?, ?, ?);
     `,
-    [id, name, places, createdAt],
+    [id, name, places, iconValue, createdAt],
   );
 }
 
@@ -49,23 +52,30 @@ export async function updateRoom(
   updates: {
     name?: string;
     places?: string;
+    icon?: string;
   },
 ) {
   await run(
     `
     UPDATE rooms
     SET name = ?,
-        places = ?
+        places = ?,
+        icon = ?
     WHERE id = ?;
     `,
-    [updates.name ?? "", updates.places ?? "", id],
+    [
+      updates.name ?? "",
+      updates.places ?? "",
+      updates.icon ?? "home-outline",
+      id,
+    ],
   );
 }
 
 export async function getRoomById(id: string) {
   return getFirst<Room>(
     `
-    SELECT id, name, places, createdAt
+    SELECT id, name, icon, places, createdAt
     FROM rooms
     WHERE id = ?
     LIMIT 1;
@@ -87,9 +97,27 @@ export async function deleteRoom(id: string) {
 export async function restoreRoom(room: Room) {
   await run(
     `
-    INSERT INTO rooms (id, name, places, createdAt)
-    VALUES (?, ?, ?, ?);
+    INSERT INTO rooms (id, name, places, icon, createdAt)
+    VALUES (?, ?, ?, ?, ?);
     `,
-    [room.id, room.name, room.places, room.createdAt],
+    [room.id, room.name, room.places, room.icon ?? "home", room.createdAt],
   );
+}
+
+export type RoomWithCount = Room & { itemCount: number };
+
+export async function listRoomsWithCounts(): Promise<RoomWithCount[]> {
+  return getAll<RoomWithCount>(`
+    SELECT
+      r.id,
+      r.name,
+      r.places,
+      r.icon,
+      r.createdAt,
+      COUNT(i.id) AS itemCount
+    FROM rooms r
+    LEFT JOIN items i ON i.roomId = r.id
+    GROUP BY r.id
+    ORDER BY r.createdAt DESC;
+  `);
 }
